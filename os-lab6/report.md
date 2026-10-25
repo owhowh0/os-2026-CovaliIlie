@@ -69,6 +69,9 @@ $ ls a
 .              1 28 32
 ..             1 1 1024
 ```
+\begin{center}
+\textit{Figure 1.1 -- xv6 root directory structure and directory creation inspection}
+\end{center}
 
 ### Observe (Part 1 Answers)
 1. **Meaning of file types 1, 2, and 3 (`kernel/stat.h`):**
@@ -140,6 +143,9 @@ main(int argc, char *argv[])
   exit(0);
 }
 ```
+\begin{center}
+\textit{Figure 2.1 -- Implementation of user/mystat.c file metadata utility}
+\end{center}
 
 The program is added to `UPROGS` in `Makefile`:
 ```make
@@ -149,6 +155,9 @@ UPROGS=\
     $U/_mystat\
     $U/_find\
 ```
+\begin{center}
+\textit{Figure 2.2 -- Registering mystat in xv6 Makefile UPROGS}
+\end{center}
 
 ### 2. Observing Hard Links in Operation
 We run `mystat` across files, create hard link `r2`, and remove `README`:
@@ -168,6 +177,9 @@ r2: file, inode 2, links 1, size 2441 bytes
 $ cat r2 | wc
 48 336 2441
 ```
+\begin{center}
+\textit{Figure 2.3 -- Inspecting inode link counters across hard link creation and unlinking}
+\end{center}
 
 ### Observe (Part 2 Answers)
 1. **Output comparison after `ln` and after `rm`:**
@@ -214,6 +226,9 @@ Inspecting filesystem parameters in `kernel/fs.h`:
 27:#define NINDIRECT (BSIZE / sizeof(uint))
 54:#define DIRSIZ 14
 ```
+\begin{center}
+\textit{Figure 3.1 -- Core filesystem block and inode constants in kernel/fs.h}
+\end{center}
 
 ### 2. Disk Layout Metadata during Image Build
 Building `fs.img` reveals disk allocation parameters:
@@ -222,6 +237,9 @@ Building `fs.img` reveals disk allocation parameters:
 ❯ make clean ; make fs.img 2>&1 | grep nmeta
 nmeta 47 (boot, super, log blocks 31, inode blocks 13, bitmap blocks 1) blocks 1953 total 2000
 ```
+\begin{center}
+\textit{Figure 3.2 -- Filesystem metadata layout calculation output from mkfs}
+\end{center}
 
 ### 3. Maximum Filename Length Test in QEMU
 Creating a directory whose name exceeds `DIRSIZ`:
@@ -233,6 +251,9 @@ $ ls
 averyveryveryl 1 29 32
 ...
 ```
+\begin{center}
+\textit{Figure 3.3 -- Directory entry filename truncation at DIRSIZ 14 characters}
+\end{center}
 
 ### Observe (Part 3 Answers)
 1. **Filename truncation in `ls`:**
@@ -355,6 +376,9 @@ main(int argc, char *argv[])
   exit(0);
 }
 ```
+\begin{center}
+\textit{Figure 4.1 -- Implementation of user/find.c recursive directory traversal utility}
+\end{center}
 
 ### 2. Verification on a Clean Directory Tree
 We create nested test directories and files, link `r2` to `cat`, and execute `find`:
@@ -372,6 +396,9 @@ $ find . r2
 $ find a b
 a/b
 ```
+\begin{center}
+\textit{Figure 4.2 -- Recursive search execution traces on nested directory structures}
+\end{center}
 
 ### 3. Stretch: Inode Identification with `-n`
 Testing the `-n` option to print corresponding inode numbers:
@@ -382,6 +409,9 @@ $ find . r2 -n
 ./a/r2 31
 ./r2 3
 ```
+\begin{center}
+\textit{Figure 4.3 -- Inode verification of duplicate hard-linked entries via find with -n flag}
+\end{center}
 
 **Analysis of the three `r2` targets:**
 - `ls` confirms that `cat` occupies inode 3 (`cat 2 3 37288`).

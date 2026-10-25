@@ -213,6 +213,18 @@ build_report() {
   tmp_dir="$(mktemp -d /tmp/labreport_build.XXXXXX)"
   trap 'rm -rf "${tmp_dir:-}"' EXIT INT TERM
 
+  # Ensure class and logo are accessible in tmp_dir
+  if [[ -f "$SCRIPT_DIR/LOGO_UTM.jpg" ]]; then
+    cp "$SCRIPT_DIR/LOGO_UTM.jpg" "$tmp_dir/"
+  elif [[ -f "LOGO_UTM.jpg" ]]; then
+    cp "LOGO_UTM.jpg" "$tmp_dir/"
+  fi
+  if [[ -f "$SCRIPT_DIR/labreport.cls" ]]; then
+    cp "$SCRIPT_DIR/labreport.cls" "$tmp_dir/"
+  elif [[ -f "labreport.cls" ]]; then
+    cp "labreport.cls" "$tmp_dir/"
+  fi
+
   # Generate title page TeX file
   cat <<TEX >"$tmp_dir/title.tex"
 \documentclass{labreport}

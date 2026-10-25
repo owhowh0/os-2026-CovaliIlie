@@ -74,6 +74,9 @@ main(int argc, char *argv[])
   exit(0);
 }
 ```
+\begin{center}
+\textit{Figure 1.1 -- Implementation of user/run.c in xv6 without standard C library abstractions}
+\end{center}
 
 We register the executable in the xv6 build system by appending `$U/_run\` to `UPROGS` in `Makefile`.
 
@@ -93,6 +96,9 @@ hello from the child
 parent: child 4 ended with status 0
 $
 ```
+\begin{center}
+\textit{Figure 1.2 -- Execution trace of run in xv6 showing child PID and parent reap}
+\end{center}
 
 ### 4. Alternative Executions
 
@@ -102,6 +108,9 @@ Modifying `user/run.c` to replace the child with `/ls`:
 char *args[] = { "ls", 0 };
 exec("ls", args);
 ```
+\begin{center}
+\textit{Figure 1.3 -- Modifying run.c to execute xv6 ls utility}
+\end{center}
 
 Rebuilding and executing under QEMU:
 
@@ -142,6 +151,9 @@ console        3 29 0
 parent: child 4 ended with status 0
 $
 ```
+\begin{center}
+\textit{Figure 1.4 -- Directory listing output produced by exec(ls) in xv6}
+\end{center}
 The child process is seamlessly replaced by `ls`, which reads the root directory entries and outputs them before exiting with status 0.
 
 #### Sub-experiment B: Exec Failure with `nosuchprog`
@@ -150,6 +162,9 @@ Testing error recovery by attempting to execute an invalid binary:
 char *args[] = { "nosuchprog", 0 };
 exec("nosuchprog", args);
 ```
+\begin{center}
+\textit{Figure 1.5 -- Modifying run.c to trigger xv6 exec failure}
+\end{center}
 
 Rebuilding and executing under QEMU:
 
@@ -161,6 +176,9 @@ exec failed
 parent: child 4 ended with status 1
 $
 ```
+\begin{center}
+\textit{Figure 1.6 -- Handling exec failure returning exit status 1 in xv6}
+\end{center}
 When `exec()` fails to locate `nosuchprog` in the file system, it returns `-1`. The child process falls through to `printf("exec failed\n")`, executes `exit(1)`, and the parent's `wait(&status)` captures the termination code `1`.
 
 ### Observe (Part 1 Answers)
@@ -192,6 +210,9 @@ Pipes in Unix are strictly unidirectional data conduits. To establish full-duple
 - `c2p[2]` (**Child-to-Parent**): Child writes to `c2p[1]`; parent reads from `c2p[0]`.
 
 ```
+\begin{center}
+\textit{Figure 2.1 -- Two-pipe bidirectional communication topology (p2c and c2p)}
+\end{center}
         +-----------------------------------------------+
         |                     PARENT                    |
         +-----------------------------------------------+
@@ -247,6 +268,9 @@ main(int argc, char *argv[])
   exit(0);
 }
 ```
+\begin{center}
+\textit{Figure 2.2 -- Implementation of user/pingpong.c synchronizing over paired pipes}
+\end{center}
 
 We register `$U/_pingpong\` in `UPROGS` of `Makefile`.
 
@@ -259,6 +283,9 @@ $ pingpong
 5: received pong
 $
 ```
+\begin{center}
+\textit{Figure 2.3 -- Execution output of pingpong in xv6 under QEMU}
+\end{center}
 
 The output confirms exact synchronization:
 1. The child (PID 6) prints `6: received ping` first.
@@ -298,3 +325,13 @@ The synchronization occurs inside xv6's `piperead()` and `pipewrite()` routines:
 
 2. **IPC Pipeline Mechanics:** Using anonymous pipes, we implemented full-duplex communication (`pingpong`).
 3. **Synchronization and Resource Management:** In both operating systems, pipe synchronization is inherently driven by file descriptor reference counting. A single forgotten write descriptor stalls reader processes indefinitely, while rigorous closure of unused endpoints allows pipelines to run reliably within constrained kernel resource limits.
+
+---
+
+## Conclusions
+
+In this laboratory work, we implemented and analyzed Unix process lifecycle primitives inside MIT's xv6 operating system on the RISC-V 64-bit architecture, directly contrasting them with Linux glibc implementations from Lab 7.
+
+Through `user/run.c`, we verified that `fork()`, `exec()`, and `wait()` operate uniformly across Unix derivatives, even in the complete absence of a standard C library runtime. The separation between process allocation and executable loading allowed the child process to cleanly replace its address space with target binaries (`echo`, `ls`). When executing nonexistent programs, xv6 returned `-1` directly from the `exec` trap, exiting with status 1 rather than the POSIX shell convention 127 seen in Linux.
+
+Finally, `user/pingpong.c` demonstrated bidirectional inter-process synchronization using two unidirectional kernel pipes (`p2c` and `c2p`). We confirmed that separate communication channels are strictly required to avoid read-after-write race conditions, and verified that closing unused descriptor handles across both parent and child processes is essential for kernel pipe buffer management and deadlock prevention.

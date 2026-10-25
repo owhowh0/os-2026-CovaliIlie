@@ -6,6 +6,25 @@ monofont: "DejaVu Sans Mono"
 # Operating Systems · FCIM / FAF · UTM · 2026-2027
 ## Lab 1 · Track A: The OS as a Resource Manager
 
+### Metadata & Environment
+- **Course:** Operating Systems, FCIM / FAF, UTM, Academic Year 2026-2027
+- **Lab Work:** Lab 1 (Track A: The OS as a Resource Manager, Linux)
+- **Author:** Ilie Covali (st. gr. FAF-243)
+- **Verified by:** Reițman Patricia
+- **Host OS:** Linux (CachyOS x86_64, Kernel 7.2.8-1-cachyos)
+- **Terminal:** Alacritty / Bash
+- **Workspace:** `/home/ilie/Documents/SO/os-lab1` (`~/os-lab1`)
+
+---
+
+## Purpose of the Work
+1. Study the role of the operating system as a primary hardware resource manager coordinating storage, processes, memory, and devices.
+2. Inspect the Unix directory tree, file metadata, ownership, and Discretionary Access Control (DAC) permissions using standard core utilities.
+3. Investigate the process lifecycle, job control, process states, and internal kernel process descriptors via the `/proc` virtual pseudo-filesystem.
+4. Analyze physical memory utilization, swap configuration, buffer/cache allocations, and block storage devices.
+
+---
+
 ### System Identification
 ```bash
 ❯ whoami
@@ -15,6 +34,9 @@ Linux thinkbook 7.2.8-1-cachyos #1 SMP PREEMPT_DYNAMIC Sat, 26 Sep 2026 19:43:45
 ❯ uptime
  16:09:20 up 23:50,  1 user,  load average: 3.28, 2.76, 2.18
 ```
+\begin{center}
+\textit{Figure 0.1 -- System identification, kernel version, and uptime}
+\end{center}
 
 ---
 
@@ -137,6 +159,9 @@ audit
 avahi
 bash.bash_logout
 ```
+\begin{center}
+\textit{Figure 1.1 -- Navigation and root directory inspection}
+\end{center}
 
 ### 2. Create, Copy, Rename, and Remove
 ```bash
@@ -154,6 +179,9 @@ total 8
 total 4
 -rw-r--r-- 1 ilie ilie 24 Sep 28 16:22 note.txt
 ```
+\begin{center}
+\textit{Figure 1.2 -- File manipulation lifecycle in demo directory}
+\end{center}
 
 ### 3. Ownership and Permissions
 ```bash
@@ -166,6 +194,9 @@ total 4
 ❯ ls -l note.txt
 -rw-r--r-- 1 ilie ilie 24 Sep 28 16:22 note.txt
 ```
+\begin{center}
+\textit{Figure 1.3 -- Modifying file permissions with chmod}
+\end{center}
 
 ### Observe (Part 1 Answers)
 1. **Who owns the files you just created, and which group?**
@@ -207,6 +238,9 @@ root          11  0.0  0.0      0     0 ?        I<   Sep27   0:00 [kworker/0:0H
 ❯ ps aux | wc -l
 377
 ```
+\begin{center}
+\textit{Figure 2.1 -- Active process tree inspection with ps}
+\end{center}
 
 ### 5. Managing Background Jobs
 ```bash
@@ -223,6 +257,9 @@ ilie      599118  584870  0 16:22 pts/5    00:00:00 grep sleep
 ❯ kill 599116
 [1]+  Terminated              sleep 300
 ```
+\begin{center}
+\textit{Figure 2.2 -- Background job control with jobs, bg, and kill}
+\end{center}
 
 ### 6. Process Introspection via `/proc`
 ```bash
@@ -271,6 +308,9 @@ VmLck:	       0 kB
 
 ❯ kill $PID
 ```
+\begin{center}
+\textit{Figure 2.3 -- Process metadata and status in /proc/<pid>/}
+\end{center}
 
 ### Observe (Part 2 Answers)
 1. **What is the PID of process number 1, and what is it (look it up)?**
@@ -312,6 +352,9 @@ VmRSS:	    1816 kB
 
 ❯ kill $PID
 ```
+\begin{center}
+\textit{Figure 3.1 -- Physical memory and swap allocation breakdown}
+\end{center}
 
 ### Observe (Part 3 Answers)
 1. **How much total RAM does the VM have, and how much is free?**
@@ -394,6 +437,9 @@ none on /sys/fs/pstore type pstore (rw,nosuid,nodev,noexec,relatime)
 efivarfs on /sys/firmware/efi/efivars type efivarfs (rw,nosuid,nodev,noexec,relatime)
 bpf on /sys/fs/bpf type bpf (rw,nosuid,nodev,noexec,relatime,mode=700)
 ```
+\begin{center}
+\textit{Figure 4.1 -- Storage topology, block devices, and filesystem mount points}
+\end{center}
 
 ### Observe (Part 4 Answers)
 1. **Which device is your root filesystem "/" mounted on?**
@@ -408,7 +454,7 @@ In `ls -l /dev`, instead of displaying regular file sizes in bytes, entries disp
 
 ---
 
-## Wrap-up and Deliverable: Closing Synthesis
+## Conclusions
 
 The operating system acts as the foundational resource manager of a computer by coordinating four core hardware resources: files and storage, processes, physical memory, and I/O devices. 
 

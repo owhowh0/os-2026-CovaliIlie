@@ -66,22 +66,24 @@
     \begin{titlepage}
         \centering
 
-        \vspace*{1.0cm}
+        \vspace*{-0.5cm}
+        \includegraphics[width=5.5cm]{LOGO_UTM.jpg}\par
+        \vspace{0.4cm}
 
         {\Large\bfseries Ministerul Educației și Cercetării al Republicii Moldova\par}
-        \vspace{0.3cm}
+        \vspace{0.25cm}
         {\Large\bfseries Universitatea Tehnică a Moldovei\par}
-        \vspace{0.3cm}
+        \vspace{0.25cm}
         {\large\bfseries Facultatea Calculatoare, Informatică și Microelectronică\par}
         \vspace{0.2cm}
         {\large\bfseries Departamentul Ingineria Software și Automatică\par}
 
-        \vspace{3.5cm}
+        \vspace{2.2cm}
 
         {\Large\bfseries Report on laboratory work no. #1\par}
-        \vspace{0.4cm}
+        \vspace{0.35cm}
         {\large Course: Operating Systems\par}
-        \vspace{0.4cm}
+        \vspace{0.35cm}
         {\large\bfseries Topic: #2\par}
 
         \vfill
@@ -98,7 +100,7 @@
             {\large\raggedleft #5}
         \end{minipage}
 
-        \vspace{2.0cm}
+        \vspace{1.5cm}
 
         {\large Chișinău -- \the\year\par}
 

@@ -71,6 +71,9 @@ int main(void)
     return 0;
 }
 ```
+\begin{center}
+\textit{Figure 1.1 -- Implementation of run.c demonstrating fork, exec, and waitpid}
+\end{center}
 
 ### 3. Compilation & Execution
 Compiling with strict diagnostic flags and executing the baseline program:
@@ -95,6 +98,9 @@ lrwxrwxrwx 1 ilie ilie    16 Oct 19 13:56  labreport.cls -> ../labreport.cls
 -rw-r--r-- 1 ilie ilie   911 Oct 19 13:57  zombie.c
 parent: child 659786 ended with status 0
 ```
+\begin{center}
+\textit{Figure 1.2 -- Execution trace of run utility showing parent and child PIDs}
+\end{center}
 
 ### 4. Alternative Program Executions
 To verify the behavior of `execlp()` across different programs and failure conditions:
@@ -109,6 +115,9 @@ child: my PID is 659839, my parent is 659838
 Mon Oct 19 01:57:52 PM EEST 2026
 parent: child 659839 ended with status 0
 ```
+\begin{center}
+\textit{Figure 1.3 -- Program execution with date command replacement}
+\end{center}
 The child successfully metamorphoses into `/usr/bin/date`, prints the formatted timestamp, and terminates cleanly with exit code 0.
 
 #### Sub-experiment B: Running `nosuchprog` (Exec Failure)
@@ -121,6 +130,9 @@ child: my PID is 659847, my parent is 659846
 exec: No such file or directory
 parent: child 659847 ended with status 127
 ```
+\begin{center}
+\textit{Figure 1.4 -- Handling exec failure and POSIX exit code 127}
+\end{center}
 Because `nosuchprog` does not exist in any directory listed in `$PATH`, `execlp` fails and returns `-1`. The child process falls through to `perror("exec")`, prints the corresponding `ENOENT` diagnostic string (`No such file or directory`) to `stderr`, and calls `exit(127)`.
 
 ### Observe (Part 1 Answers)
@@ -181,6 +193,9 @@ int main(void)
     return 0;
 }
 ```
+\begin{center}
+\textit{Figure 2.1 -- Implementation of zombie.c creating a delayed-harvest child}
+\end{center}
 
 ### 3. Compilation & Execution Trace
 We start `./zombie` in the background with stdout redirected to `/dev/null` to keep the terminal clean, inspect the process table after 2 seconds, and inspect it again after the 20-second sleep expires:
@@ -196,6 +211,9 @@ We start `./zombie` in the background with stdout redirected to `/dev/null` to k
  659863  659861 Z<+  [ls] <defunct>
  659864  659860 R<+  ps -o pid,ppid,stat,cmd -g 659860
 ```
+\begin{center}
+\textit{Figure 1.2 -- Execution trace of run utility showing parent and child PIDs}
+\end{center}
 
 After waiting for the 20-second sleep interval to finish:
 
@@ -271,6 +289,9 @@ int main(void)
     return 0;
 }
 ```
+\begin{center}
+\textit{Figure 3.1 -- Implementation of redirect.c utilizing lowest free descriptor rule}
+\end{center}
 
 ### 3. Compilation & Verification
 Compiling and executing `redirect.c`, followed by inspecting the generated `out.txt`:
@@ -288,6 +309,9 @@ lrwxrwxrwx 1 ilie ilie    16 Oct 19 13:56 labreport.cls -> ../labreport.cls
 -rw-r--r-- 1 ilie ilie   378 Oct 19 13:57 Makefile
 -rw-r--r-- 1 ilie ilie 35137 Oct 19 13:51 OS 2026 - Lab 7 - Three Small Programs (Linux).docx
 ```
+\begin{center}
+\textit{Figure 3.2 -- Output verification of standard stream redirection into out.txt}
+\end{center}
 
 The diagnostic output to `stderr` confirms that `open()` returned descriptor `1`. The terminal displayed none of the directory listing lines; all 168 KB of directory content was captured inside `out.txt`.
 
@@ -357,6 +381,9 @@ int main(void)
     return 0;
 }
 ```
+\begin{center}
+\textit{Figure 4.1 -- Implementation of pipeline.c connecting ls and wc via unidirectional pipe}
+\end{center}
 
 ### 3. Compilation & Output Equivalence Check
 We compile and run `./pipeline` and compare its output directly against the native shell command `ls /etc | wc -l`:
@@ -368,6 +395,9 @@ We compile and run `./pipeline` and compare its output directly against the nati
 ❯ ls /etc | wc -l
 259
 ```
+\begin{center}
+\textit{Figure 4.2 -- Output equivalence check between pipeline binary and shell pipe}
+\end{center}
 Both commands return `259`, confirming exact data transport and synchronization.
 
 ### 4. Intentional Breakage Experiment: The Hanging Pipe
@@ -379,6 +409,9 @@ We test the synchronization model by intentionally commenting out the parent's w
     wait(NULL);
     wait(NULL);
 ```
+\begin{center}
+\textit{Figure 4.3 -- Intentional bug: omitting close(p[1]) in parent process}
+\end{center}
 
 When compiled and executed:
 
@@ -388,6 +421,9 @@ When compiled and executed:
 # The process hangs indefinitely until interrupted by SIGINT (Ctrl-C)
 ^C
 ```
+\begin{center}
+\textit{Figure 4.4 -- Pipe deadlocking trace caused by unclosed write-end reference}
+\end{center}
 
 ### Observe (Part 4 Answers)
 1. **Did `./pipeline` and `ls /etc | wc -l` give the same number?**
@@ -398,3 +434,13 @@ When compiled and executed:
 
 3. **Why, in one sentence: what is `wc` waiting for?**
 4. **IPC Pipelines & Reference Counting**: We constructed a two-stage pipeline using an anonymous pipe and descriptor duplication. Crucially, we demonstrated that pipe data streams rely on strict write-end reference counts: omitting a single `close()` call on a write descriptor prevents reader processes from receiving EOF, resulting in indefinite execution deadlocks.
+
+---
+
+## Conclusions
+
+In this laboratory work, we investigated the POSIX process management model and inter-process communication mechanisms under Linux.
+
+Through the implementation of `run.c`, we demonstrated the fundamental Unix principle of separating process replication (`fork()`) from program image replacement (`exec()`), synchronized by the parent process using `waitpid()`. In `zombie.c`, we observed how terminated processes linger as defunct entries in the process table until explicitly harvested by their parent, understanding the reparenting role of `init` (PID 1) in preventing process table exhaustion. 
+
+Furthermore, `redirect.c` validated the lowest-numbered free file descriptor allocation rule (`close(1)` followed by `open()`), which serves as the foundation for shell stream redirection. Finally, `pipeline.c` established how unidirectional kernel pipe buffers connect arbitrary programs, while demonstrating the critical necessity of closing unused write descriptors across all processes to avoid deadlocks caused by consumers perpetually waiting for `EOF`.

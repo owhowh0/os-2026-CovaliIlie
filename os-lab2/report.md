@@ -5,11 +5,25 @@ mainfont: "DejaVu Serif"
 # Operating Systems · FCIM / FAF · UTM · 2026-2027
 ## Lab 2 · Track B: Meet the OS You Will Build (xv6)
 
-### Environment & Toolchain
-- **Host OS:** Linux (CachyOS x86_64, Kernel 7.2.8)
+### Metadata & Environment
+- **Course:** Operating Systems, FCIM / FAF, UTM, Academic Year 2026-2027
+- **Lab Work:** Lab 2 (Track B: Meet the OS You Will Build, xv6)
+- **Author:** Ilie Covali (st. gr. FAF-243)
+- **Verified by:** Reițman Patricia
+- **Host OS:** Linux (CachyOS x86_64, Kernel 7.2.8-1-cachyos)
 - **Target Architecture:** RISC-V 64-bit (`riscv64-linux-gnu`)
-- **Emulator:** QEMU RISC-V System Emulator (`qemu-system-riscv`)
+- **Emulator:** QEMU RISC-V System Emulator (`qemu-system-riscv64` 10.1.0)
 - **Toolchain Packages:** `git`, `base-devel`, `gdb`, `qemu-system-riscv`, `riscv64-linux-gnu-gcc`, `riscv64-linux-gnu-binutils`
+- **Workspace:** `/home/ilie/Documents/SO/os-lab2` (`~/os-lab2`)
+
+---
+
+## Purpose of the Work
+1. Set up the RISC-V cross-compilation toolchain and QEMU system emulator to build and boot the xv6 educational operating system.
+2. Experience the xv6 shell user interface and verify standard Unix utilities (`cat`, `ls`, `echo`, `grep`, `wc`, and pipes).
+3. Study the architectural separation between privileged kernel space (RISC-V Supervisor mode) and unprivileged user space (User mode).
+4. Trace the system call execution path from user C function calls through assembly trap stubs (`ecall`) to kernel dispatchers (`kernel/syscall.c`, `kernel/sysfile.c`).
+5. Author, integrate, and verify a new user-space utility (`user/sleep.c`) within the xv6 build system using the `pause()` system call.
 
 ---
 
@@ -28,6 +42,9 @@ hart 1 starting
 init: starting sh
 $ 
 ```
+\begin{center}
+\textit{Figure 1.1 -- Booting xv6 under QEMU RISC-V}
+\end{center}
 
 ### 2. Exiting QEMU
 xv6 executes inside the QEMU hardware emulator. To quit and return to the host terminal:
@@ -83,6 +100,9 @@ console        3 23 0
 $ wc README
 47 314 2441 README
 ```
+\begin{center}
+\textit{Figure 2.1 -- Testing standard utilities and pipeline in xv6}
+\end{center}
 
 ### Observe (Part 2 Answers)
 1. **List three programs xv6 ships with:**
@@ -158,6 +178,9 @@ System calls are declared in `user/user.h` and dispatched to kernel routines:
      return fileread(f, p, n);
    }
    ```
+\begin{center}
+\textit{Figure 3.1 -- Tracing the sys\_read implementation in kernel/sysfile.c}
+\end{center}
 
 3. **In one sentence: what is the difference between the code in `kernel/` and the code in `user/`?**
    - Code in `kernel/` runs in privileged Supervisor mode with direct access to physical memory, hardware devices, page tables, and CPU control registers, whereas code in `user/` runs in unprivileged User mode with restricted address spaces and must invoke system calls (`ecall`) to request the kernel to perform privileged operations.
@@ -176,6 +199,9 @@ user/sleep.c:11:3: error: implicit declaration of function 'sleep' [-Wimplicit-f
       |   ^~~~~
 make: *** [<builtin>: user/sleep.o] Error 1
 ```
+\begin{center}
+\textit{Figure 4.1 -- Compiler error when referencing undeclared sleep()}
+\end{center}
 
 **Root Cause:**
 In this version of the course `xv6-riscv` repository:
@@ -203,6 +229,9 @@ main(int argc, char *argv[])
   exit(0);
 }
 ```
+\begin{center}
+\textit{Figure 4.2 -- Source code of user/sleep.c using pause()}
+\end{center}
 
 ### 3. Adding `sleep` to `Makefile`
 In `Makefile`, `$U/_sleep\` was added to the `UPROGS` list:
@@ -224,10 +253,17 @@ $ sleep 10
 $ sleep
 usage: sleep <ticks>
 ```
-
-
+\begin{center}
+\textit{Figure 4.3 -- Verified execution of sleep utility in xv6}
+\end{center}
 
 ---
+
+## Conclusions
+
+In this laboratory work, we initialized and explored the educational xv6 operating system on the RISC-V 64-bit architecture.
+
+We observed firsthand the strict boundary dividing privileged Supervisor mode (`kernel/`) from unprivileged User mode (`user/`), learning that all user-level requests for hardware or kernel state must traverse the `ecall` trap mechanism and system call routing table (`syscall.c`). Furthermore, we confirmed the modularity of Unix process abstraction by using pipelines within xv6, which required concurrent process scheduling and kernel-managed IPC buffers. Finally, we resolved kernel API version differences by adapting `user/sleep.c` to use `pause()` instead of `sleep()`, successfully integrated the binary into the `Makefile`'s `UPROGS` image generator, and validated its execution in QEMU.
 
 ## Deliverables Checklist
 - [x] [user/sleep.c](file:///home/ilie/Documents/SO/os-lab2/xv6-riscv/user/sleep.c): Working sleep program with argument validation and system call invocation.

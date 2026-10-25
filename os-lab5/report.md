@@ -45,6 +45,9 @@ drwxr-xr-x  1 root root 4844 Oct 12 15:23 /etc
 -rw-r--r--  1 root root 2395 Sep 28 15:43 /etc/passwd
 drwxrwxrwt 19 root root  560 Oct 12 15:33 /tmp
 ```
+\begin{center}
+\textit{Figure 1.1 -- Root hierarchy and system file type inspection}
+\end{center}
 
 ### 2. Device Nodes and File Classification
 Examining `/dev` device nodes and identifying file types via the `file` utility:
@@ -67,6 +70,9 @@ drwxr-xr-x   6 root root          120 Oct 12 15:18 cpu
 /etc/passwd: ASCII text
 /bin:        symbolic link to usr/bin
 ```
+\begin{center}
+\textit{Figure 1.2 -- Device nodes and character versus block classification in /dev}
+\end{center}
 
 ### 3. Space Utilization: `/var/log` vs `/usr`
 Measuring directory disk consumption:
@@ -76,6 +82,9 @@ Measuring directory disk consumption:
 51M	/var/log
 27G	/usr
 ```
+\begin{center}
+\textit{Figure 1.3 -- Comparing disk utilization of /var/log versus /usr}
+\end{center}
 
 ### Observe (Part 1 Answers)
 1. **Type of each path from the first character in `ls -l`:**
@@ -117,6 +126,9 @@ Change: 2026-10-12 15:37:00.233648308 +0300
 ❯ ls -li notes.txt
 5310683 -rw-r--r-- 1 ilie ilie 6 Oct 12 15:37 notes.txt
 ```
+\begin{center}
+\textit{Figure 2.1 -- Inode identification and link counter inspection}
+\end{center}
 
 ### 2. Hard Link Creation and Target Unlinking
 Linking an additional directory entry to the existing inode and removing the original entry:
@@ -132,6 +144,9 @@ Linking an additional directory entry to the existing inode and removing the ori
 hello
 5310683 -rw-r--r-- 1 ilie ilie 6 Oct 12 15:37 hard.txt
 ```
+\begin{center}
+\textit{Figure 2.2 -- Inode sharing across hard links and survival after target removal}
+\end{center}
 
 ### 3. Symbolic Link Behavior on Broken Reference
 Creating a symlink, reading its content, and deleting the referenced target:
@@ -152,6 +167,9 @@ cat: soft.txt: No such file or directory
 ❯ ls -l soft.txt
 lrwxrwxrwx 1 ilie ilie 8 Oct 12 15:37 soft.txt -> hard.txt
 ```
+\begin{center}
+\textit{Figure 2.3 -- Symbolic link creation and broken reference detection}
+\end{center}
 
 ### 4. Directory Link Counter Progression
 Testing directory link counters upon subdirectory creation:
@@ -163,6 +181,9 @@ drwxr-xr-x 1 ilie ilie 0 Oct 12 15:37 d
 ❯ mkdir d/x d/y ; ls -ld d
 drwxr-xr-x 1 ilie ilie 4 Oct 12 15:37 d
 ```
+\begin{center}
+\textit{Figure 2.4 -- Subdirectory creation and directory link count progression on ext4/tmpfs}
+\end{center}
 
 *Note on Btrfs vs Traditional Unix Filesystems:*
 The current workspace resides on a Btrfs subvolume. Modern filesystems like Btrfs do not update directory `st_nlink` upon subdirectory creation (reporting static link count 1) to prevent costly locking across large B-trees. Running the identical test on a standard POSIX filesystem (`tmpfs` / `ext4`) reveals the classic behavior:
@@ -175,6 +196,9 @@ drwxr-xr-x 2 ilie ilie 40 Oct 12 15:32 d
 ❯ mkdir d/x d/y ; ls -ld d
 drwxr-xr-x 4 ilie ilie 80 Oct 12 15:32 d
 ```
+\begin{center}
+\textit{Figure 2.5 -- Btrfs subvolume directory link count behavior}
+\end{center}
 
 ### 5. Logical File Size versus Allocated Disk Blocks
 Comparing apparent byte size with allocated storage:
@@ -190,6 +214,9 @@ Comparing apparent byte size with allocated storage:
 
 ❯ rm big.img
 ```
+\begin{center}
+\textit{Figure 2.6 -- Sparse file creation contrasting logical length with allocated disk blocks}
+\end{center}
 
 ### Observe (Part 2 Answers)
 1. **Which number in `stat` is the inode, and which tells how many names the file has?**
@@ -238,6 +265,9 @@ secret
 drwxr-xr-x 1 ilie ilie 0 Oct 12 15:37 newdir
 -rw-r--r-- 1 ilie ilie 0 Oct 12 15:37 new.txt
 ```
+\begin{center}
+\textit{Figure 3.1 -- DAC permission verification and umask mask calculation}
+\end{center}
 
 ### 2. Directory Permissions: Read (`r`) vs Execute (`x`)
 Predicting and testing access restrictions on directories:
@@ -261,6 +291,9 @@ hi
 
 ❯ chmod 755 box
 ```
+\begin{center}
+\textit{Figure 3.2 -- Contrast between directory read permission and execute traversal permission}
+\end{center}
 
 ### 3. Special Bits (SetUID, Sticky) and Protected Files
 Examining binary privilege escalations and system shadow files:
@@ -276,6 +309,9 @@ cat: /etc/shadow: Permission denied
 ❯ ls -l /etc/shadow
 -rw------- 1 root root 1124 Sep 28 15:43 /etc/shadow
 ```
+\begin{center}
+\textit{Figure 3.3 -- SetUID and Sticky bit inspection on privileged executables and directories}
+\end{center}
 
 ### Observe (Part 3 Answers)
 1. **Translate 600, 644, 755, and 700 into `rwx` strings with realistic use cases:**
@@ -335,6 +371,9 @@ Filesystem      Size  Used Avail Use% Mounted on
 ❯ mount | grep " / "
 /dev/nvme0n1p2 on / type btrfs (rw,noatime,compress=zstd:1,ssd,discard=async,space_cache=v2,subvolid=256,subvol=/@)
 ```
+\begin{center}
+\textit{Figure 4.1 -- Root filesystem storage topology and Btrfs subvolume mount parameters}
+\end{center}
 
 ### 2. Kernel Hardware Parameters via `/proc`
 Extracting processor, memory, and runtime process information:
@@ -362,6 +401,9 @@ lrwx------ 1 ilie ilie 64 Oct 12 15:37 1 -> /dev/pts/3
 lrwx------ 1 ilie ilie 64 Oct 12 15:37 2 -> /dev/pts/3
 lr-x------ 1 ilie ilie 64 Oct 12 15:37 3 -> /proc/100184/fd
 ```
+\begin{center}
+\textit{Figure 4.2 -- CPU topology and runtime process status via /proc virtual filesystem}
+\end{center}
 
 ### Observe (Part 4 Answers)
 1. **Disk Partition Layout:**
@@ -404,6 +446,9 @@ notes.gz: gzip compressed data, was "passwd", last modified: Mon Sep 28 12:43:28
 ❯ xxd notes.gz | head -1
 00000000: 1f8b 0808 f060 ba6a 0003 7061 7373 7764  .....`.j..passwd
 ```
+\begin{center}
+\textit{Figure 5.1 -- Identifying file signatures and magic numbers with xxd}
+\end{center}
 
 **Analysis:**
 The first two bytes `1f 8b` (hexadecimal `0x1F8B`) represent the magic number mandated by RFC 1952 for Gzip streams. The third byte (`0x08`) specifies the compression method (`DEFLATE`). The `file` utility matches these bytes against its magic database rather than relying on the `.gz` filename suffix.
@@ -426,6 +471,9 @@ Auditing privileged executables installed across the root filesystem:
 /usr/bin/newgrp
 /usr/bin/su
 ```
+\begin{center}
+\textit{Figure 5.2 -- System-wide audit of SetUID executables}
+\end{center}
 
 **Analysis:**
 Beyond standard Unix utilities shown in lecture slides (`passwd`, `su`, `sudo`), the system includes modern privileged helpers such as `pkexec` (Polkit authorization framework) and `fusermount3` (enabling unprivileged users to mount FUSE filesystems like browser profile RAM-caches).
@@ -441,6 +489,9 @@ Demonstrating kernel reference counting on unlinked file descriptors:
 lr-x------ 1 ilie ilie 64 Oct 12 15:33 3 -> '/home/ilie/Documents/SO/os-lab5/bigfile (deleted)'
 ❯ exec 3<&-
 ```
+\begin{center}
+\textit{Figure 5.3 -- Preserved inode access and delayed block reclamation on open unlinked files}
+\end{center}
 
 **Analysis:**
 When `rm bigfile` executes, the directory entry is removed from the dentry tree, but the link in `/proc/$$/fd/3` shows the file marked as `(deleted)`. The kernel does not deallocate the inode or free physical disk blocks while active open file descriptors exist. The space is reclaimed only after closing descriptor 3 (`exec 3<&-`), when the inode reference count drops to 0.
