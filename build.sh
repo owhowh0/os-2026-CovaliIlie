@@ -172,12 +172,15 @@ build_report() {
   title="${title:-Laboratory Work}"
 
   if [[ -z "$out_file" ]]; then
-    if [[ "$base_input" == *.md ]]; then
-      out_file="${base_input%.md}.pdf"
-    elif [[ "$base_input" == *.pdf ]]; then
+    if [[ "$base_input" == *.pdf ]]; then
       out_file="${base_input%.pdf}_with_title.pdf"
     else
-      out_file="report.pdf"
+      local clean_author clean_group
+      clean_author="${author// /}"
+      clean_group="${group// /}"
+      clean_group="${clean_group#st.}"
+      clean_group="${clean_group#gr.}"
+      out_file="Lab${lab_num}_${clean_author}_${clean_group}.pdf"
     fi
   fi
 
