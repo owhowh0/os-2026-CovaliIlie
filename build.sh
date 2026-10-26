@@ -21,7 +21,7 @@ Usage: $(basename "$0") [OPTIONS] [TARGET | INPUT] [OUTPUT]
        $(basename "$0") <title.pdf> <body.pdf> [output.pdf]
 
 Build lab report PDF with UTM LaTeX title page (labreport.cls)
-and pandoc-generated body PDF and Word (.docx) report.
+and pandoc-generated body PDF.
 
 Targets:
   all                     Build all labs (os-lab*) in repository
@@ -274,17 +274,6 @@ TEX
       -H "$tmp_dir/code_wrap.tex"
     body_pdf="$tmp_dir/body.pdf"
 
-    # Also generate compliant .docx report
-    if command -v pandoc >/dev/null 2>&1; then
-      local clean_author clean_group docx_file
-      clean_author="${author// /}"
-      clean_group="${group// /}"
-      clean_group="${clean_group#st.}"
-      clean_group="${clean_group#gr.}"
-      docx_file="Lab${lab_num}_${clean_author}_${clean_group}.docx"
-      echo "Generating Word document: $docx_file..."
-      pandoc "$base_input" -o "$docx_file" || true
-    fi
   fi
 
   echo "Joining title page and report body..."
