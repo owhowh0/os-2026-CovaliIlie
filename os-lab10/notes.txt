@@ -1,0 +1,43 @@
+Lab 10 Notes: Add Your Own System Call: trace (xv6)
+Author: Ilie Covali (gr. FAF-243)
+Instructor: Reițman Patricia
+
+============================================================
+Observe Answers:
+============================================================
+
+1. In trace 32 grep hello README why do you see only read, and not open or close?
+Answer:
+The mask argument is interpreted as a bitmask where bit N controls tracing for system call number N.
+The decimal value 32 in binary is 100000_2 (2^5), meaning only bit 5 is enabled.
+In kernel/syscall.h, SYS_read is defined as 5, whereas SYS_open is 15 and SYS_close is 21.
+Because bits 15 and 21 are 0, the kernel check ((p->trace_mask >> num) & 1) evaluates to true only for syscall 5 (read).
+
+2. In forkforkfork, three different pids print lines. Which line of code from Part 2 makes that possible?
+Answer:
+The line in kernel/proc.c inside fork():
+    np->trace_mask = p->trace_mask;
+When a parent forks, this copies the parent's trace_mask into the child's struct proc, ensuring child and descendant processes inherit the tracing mask across fork() calls.
+
+3. In trace 65536 echo hi the trace line is printed between "hi" and the new line. Why? (How many times does echo call write?)
+Answer:
+echo calls write twice:
+- The first write outputs the argument string "hi" (write(1, "hi", 2)).
+- The second write outputs the trailing newline "\n" (write(1, "\n", 1)).
+In kernel/syscall.c, the trace printk statement executes immediately after the syscall completes:
+    p->trapframe->a0 = syscalls[num]();
+    if ((p->trace_mask >> num) & 1)
+      printk("%d: syscall %s -> %ld\n", p->pid, syscallnames[num], p->trapframe->a0);
+Therefore:
+1. echo calls write("hi"), which writes "hi" to the console UART.
+2. The kernel immediately prints the trace line "4: syscall write -> 2\n".
+3. echo calls write("\n"), which prints the newline.
+4. The kernel immediately prints the second trace line "4: syscall write -> 1\n".
+
+4. Which mask traces both open (15) and close (21), and nothing else?
+Answer:
+Bit 15 corresponds to 2^15 = 32768.
+Bit 21 corresponds to 2^21 = 2097152.
+Combining both bits gives:
+    2^15 + 2^21 = 32768 + 2097152 = 2129920 (hex 0x208000).
+Running `trace 2129920 grep hello README` traces open and close only.
