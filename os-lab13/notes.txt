@@ -1,0 +1,16 @@
+Lab 13 Observe Answers
+Author: Ilie Covali (gr. FAF-243)
+Instructor: Reițman Patricia
+
+1. Without the lock, why do the letters mix? (How many system calls does one line cost?)
+   One line consists of 30 characters plus 1 newline ('\n'), costing exactly 31 separate write(1, p, 1) system calls. Because xv6 executes on multiple CPU cores (SMP with 3 CPUs in QEMU), process A and process B execute concurrently on separate cores. Furthermore, timer interrupts preempt processes at arbitrary instruction boundaries. As a result, the 31 system calls of both processes interleave non-deterministically when transmitting characters to the UART console, scrambling the lines.
+
+2. With the lock every line is whole. Which two lines of mix.c make one line a critical section?
+   - Line 174: `if (uselock) sem_down(3);` immediately before printing the characters of one line.
+   - Line 178: `if (uselock) sem_up(3);` immediately after printing the characters and newline of that line.
+
+3. In sem_down the test is "while (s->value == 0)", not "if". Why can a process wake up and still find 0?
+   `wakeup(s)` wakes up all processes currently sleeping on channel `s`. If multiple processes were queued waiting for semaphore `s` and a single `sem_up` increments `value` from 0 to 1, all waiting processes wake up and contend for `s->lock`. The first process to acquire `s->lock` decrements `value` back from 1 to 0. When subsequent awakened processes acquire `s->lock`, they find `s->value == 0`. Using `while` ensures that they re-check the condition and go back to sleep.
+
+4. sem_down calls release(&s->lock) BEFORE sleep(). What would go wrong if it slept holding the spinlock?
+   Sleeping while holding a spinlock in xv6 causes a permanent kernel deadlock. Spinlocks disable local interrupts on the CPU core holding the lock. If a process went to sleep holding `s->lock`, no other process could ever acquire `s->lock` to call `sem_up` and increment `s->value`. Furthermore, any process on another CPU core attempting to acquire `s->lock` would spin indefinitely in an infinite busy loop with interrupts disabled, completely freezing the operating system.
