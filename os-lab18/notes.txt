@@ -1,0 +1,29 @@
+Lab 18 Notes: A User-Level Thread Switch (xv6)
+Author: Ilie Covali (gr. FAF-243)
+Instructor: Reițman Patricia
+
+============================================================
+Observe Answer:
+============================================================
+
+Question:
+What exactly does thread_switch save and load? Why is ra the register that makes execution continue in the other thread?
+
+Answer:
+1. What thread_switch saves and loads:
+`thread_switch` saves and loads exactly the 14 RISC-V callee-saved registers defined by the RISC-V calling convention:
+- `ra` (Return Address register, x1)
+- `sp` (Stack Pointer register, x2)
+- `s0` / `fp` (Saved Register / Frame Pointer, x8)
+- `s1` (Saved Register, x9)
+- `s2` through `s11` (Saved Registers, x18 through x27)
+It does not save caller-saved registers (such as `t0`..`t6`, `a0`..`a7`), because under the standard C calling convention, the caller function (`thread_schedule`) expects those to be volatile across function calls and has already pushed any needed caller-saved values to its own stack before calling `thread_switch`.
+
+2. Why ra is the register that makes execution continue in the other thread:
+In RISC-V assembly, function returns execute `ret`, which is pseudo-assembly for `jalr x0, 0(ra)` (jump to the address stored in register `ra`).
+When `thread_switch(old, new)` runs:
+- It saves the current thread's return address in `old->ctx.ra`.
+- It loads `new->ctx.ra` into register `ra`.
+- When `thread_switch` executes `ret`, the CPU jumps to the target address loaded into `ra`:
+  a) For a newly created thread (initialized by `thread_create`): `ctx.ra` was set to the function pointer of the thread entry point (`func`). The `ret` instruction jumps straight to the beginning of `func`, starting the thread on its own dedicated stack (`ctx.sp`).
+  b) For an existing thread that previously yielded: `ctx.ra` holds the instruction address immediately after the `thread_switch(&old->ctx, &next_thread->ctx)` call in `thread_schedule`. The `ret` instruction jumps back to that exact continuation point, allowing the thread to resume execution seamlessly as if `thread_switch` had simply returned.
